@@ -5,12 +5,14 @@ export default {
     users: (root, args, context, info) => {
       return User.find({})
     },
-    me: (root, args, context, info) => {
+    me: (root, args, { user }, info) => {
+      return User.findById(user._id)
     }
   },
-  Mutation: {
-    signUp: (root, args, context, info) => {
-
+  User: {
+    favourites: async (user) => {
+      const result = await User.findById(user).populate('favourites').exec()
+      return result.favourites
     }
   }
 }

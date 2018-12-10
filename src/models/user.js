@@ -1,8 +1,11 @@
 import mongoose from 'mongoose'
 
 const userSchema = new mongoose.Schema({
-  email: String,
-  password: String
+  favourites: [{
+    type: mongoose.Schema.ObjectId,
+    ref: 'Radio'
+  }],
+  userId: String
 }, {
   timestamps: true
 })
