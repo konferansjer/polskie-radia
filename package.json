@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "eval $(cat .env) nodemon -r esm",
-    "start": "eval $(cat .env) node -r esm"
+    "start": "eval $(cat .env) node -r esm ."
   },
   "devDependencies": {
     "esm": "^3.0.84",
