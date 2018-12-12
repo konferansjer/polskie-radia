@@ -1,10 +1,19 @@
 import express from 'express'
 import { ApolloServer } from 'apollo-server-express'
+import mongoose from 'mongoose'
+import bodyParser from 'body-parser'
+import jwks from 'jwks-rsa'
+import jwt from 'express-jwt'
+
 import typeDefs from './typeDefs'
 import resolvers from './resolvers'
-import mongoose from 'mongoose'
 import jwtAuth from './auth'
 import RequireAuthDirective from './directives/auth'
+
+function skipJwtError (err, req, res, next) {
+  console.error(err)
+  if (err) next()
+}
 
 (async () => {
   try {
@@ -15,7 +24,9 @@ import RequireAuthDirective from './directives/auth'
       DB_HOST,
       DB_PASSWORD,
       DB_PORT,
-      DB_NAME
+      DB_NAME,
+      AUTH0_DOMAIN,
+      AUTH0_AUDIENCE
     } = process.env
 
     await mongoose.connect(
@@ -23,8 +34,23 @@ import RequireAuthDirective from './directives/auth'
       { useNewUrlParser: true }
     )
 
+    const auth = jwt({
+      secret: jwks.expressJwtSecret({
+        cache: true,
+        rateLimit: true,
+        jwksRequestsPerMinute: 5,
+        jwksUri: `${AUTH0_DOMAIN}.well-known/jwks.json`
+      }),
+      credentialsRequired: false,
+      audience: AUTH0_AUDIENCE,
+      issuer: AUTH0_DOMAIN,
+      algorithms: ['RS256']
+    })
+
     const app = express()
+
     app.disable('x-powered-by')
+    app.use(bodyParser.json(), auth, skipJwtError)
 
     const server = new ApolloServer({
       typeDefs,

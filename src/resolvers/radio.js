@@ -1,6 +1,6 @@
 import { Radio, User } from '../models'
 import mongoose from 'mongoose'
-import { UserInputError, AuthenticationError } from 'apollo-server-express'
+import { UserInputError } from 'apollo-server-express'
 
 export default {
   Query: {
@@ -32,7 +32,6 @@ export default {
       })
     },
     addRadioToFavourites: async (root, { id }, { user }, info) => {
-      if (!user) throw new AuthenticationError('Unauthorized')
       await User.update(
         { _id: user._id },
         { $addToSet: { favouriteRadios: [id] } }
@@ -40,7 +39,6 @@ export default {
       return true
     },
     removeRadioFromFavourites: async (root, { id }, { user }, info) => {
-      if (!user) throw new AuthenticationError('Unauthorized')
       await User.update(
         { _id: user._id },
         { $pull: { favouriteRadios: id } }
