@@ -3,6 +3,10 @@ import radio from './radio'
 import { gql } from 'apollo-server-express'
 
 const baseTypes = gql`
+  directive @requireAuth(
+    roles: [Role]
+  ) on FIELD_DEFINITION
+  
   type Query {
     _: String
   }
@@ -13,6 +17,11 @@ const baseTypes = gql`
 
   type Subscription {
     _: String
+  }
+
+  enum Role {
+    admin
+    client
   }
 `
 

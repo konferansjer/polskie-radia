@@ -3,7 +3,8 @@ import { ApolloServer } from 'apollo-server-express'
 import typeDefs from './typeDefs'
 import resolvers from './resolvers'
 import mongoose from 'mongoose'
-import auth from './auth'
+import jwtAuth from './auth'
+import RequireAuthDirective from './directives/auth'
 
 (async () => {
   try {
@@ -28,13 +29,16 @@ import auth from './auth'
     const server = new ApolloServer({
       typeDefs,
       resolvers,
+      schemaDirectives: {
+        requireAuth: RequireAuthDirective
+      },
       playground: NODE_ENV !== 'production',
-      context: auth
+      context: jwtAuth
     })
 
     server.applyMiddleware({ app })
     app.listen({ port: APP_PORT }, () => console.log(`http://localhost:${APP_PORT}${server.graphqlPath}`))
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 })()

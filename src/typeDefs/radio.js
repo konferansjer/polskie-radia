@@ -2,15 +2,16 @@ import { gql } from 'apollo-server-express'
 
 export default gql`
   extend type Query {
-    radios: [Radio!]!
-    radio(id: String!): Radio
+    listRadios: [Radio!]! 
+    findRadioById(id: ID!): Radio
   }
 
   extend type Mutation {
-    createRadio(name: String!, streamUrl: String!, imageUrl: String, desc: String ) : Radio
-    updateRadio(id: String!, name: String, streamUrl: String, imageUrl: String, desc: String ) : Radio
-    addToFavourites(radioId: String!) : Boolean!
-    removeFromFavourites(radioId: String!) : Boolean!
+    createRadio(input: RadioInput) : Radio @requireAuth(roles: [admin])
+    updateRadio(input: RadioInputUpdate) : Radio @requireAuth(roles: [admin])
+    deleteRadio(id: ID!) : Boolean @requireAuth(roles: [admin])
+    addRadioToFavourites(id: ID!) : Boolean! @requireAuth(roles: [admin, client])
+    removeRadioFromFavourites(id: ID!) : Boolean! @requireAuth(roles: [admin, client])
   }
 
   type Radio {
@@ -21,5 +22,20 @@ export default gql`
     desc: String
     createdAt: String!
     updatedAt: String!
+  }
+
+  input RadioInput {
+    name: String!
+    streamUrl: String!
+    imageUrl: String
+    desc: String
+  }
+
+  input RadioInputUpdate {
+    id: ID!
+    name: String
+    streamUrl: String
+    imageUrl: String
+    desc: String
   }
 `

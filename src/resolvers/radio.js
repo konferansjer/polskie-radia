@@ -4,10 +4,10 @@ import { UserInputError, AuthenticationError } from 'apollo-server-express'
 
 export default {
   Query: {
-    radios: (root, args, context, info) => {
+    listRadios: (root, args, context, info) => {
       return Radio.find({})
     },
-    radio: (root, { id }, context, info) => {
+    findRadioById: (root, { id }, context, info) => {
       if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new UserInputError('Invalid id')
       }
@@ -18,6 +18,10 @@ export default {
     createRadio: (root, args, context, info) => {
       return Radio.create(args)
     },
+    deleteRadio: async (root, { id }, context, info) => {
+      await Radio.find({ _id: id }).remove().exec()
+      return true
+    },
     updateRadio: (root, { id, ...args }, context, info) => {
       if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new UserInputError('Invalid id')
@@ -27,19 +31,19 @@ export default {
         return radio
       })
     },
-    addToFavourites: async (root, { radioId }, { user }, info) => {
+    addRadioToFavourites: async (root, { id }, { user }, info) => {
       if (!user) throw new AuthenticationError('Unauthorized')
       await User.update(
         { _id: user._id },
-        { $addToSet: { favourites: [radioId] } }
+        { $addToSet: { favouriteRadios: [id] } }
       )
       return true
     },
-    removeFromFavourites: async (root, { radioId }, { user }, info) => {
+    removeRadioFromFavourites: async (root, { id }, { user }, info) => {
       if (!user) throw new AuthenticationError('Unauthorized')
       await User.update(
         { _id: user._id },
-        { $pull: { favourites: radioId } }
+        { $pull: { favouriteRadios: id } }
       )
       return true
     }

@@ -53,7 +53,6 @@ const auth = async ({ req }) => {
       { userId: extUser.userId },
       { new: true, upsert: true, runValidators: true }
     )
-
     contextUser.role = extUser.role
     return { user: contextUser }
   } catch (error) {

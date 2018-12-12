@@ -1,18 +1,26 @@
 import { User } from '../models'
+import mongoose from 'mongoose'
+import { UserInputError } from 'apollo-server-express'
 
 export default {
   Query: {
-    users: (root, args, context, info) => {
+    listUsers: (root, args, context, info) => {
       return User.find({})
+    },
+    findUserById: (root, { id }, context, info) => {
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new UserInputError('Invalid id')
+      }
+      return User.findById(id)
     },
     me: (root, args, { user }, info) => {
       return User.findById(user._id)
     }
   },
   User: {
-    favourites: async (user) => {
-      const result = await User.findById(user).populate('favourites').exec()
-      return result.favourites
+    favouriteRadios: async (user) => {
+      const result = await User.findById(user).populate('favouriteRadios').exec()
+      return result.favouriteRadios
     }
   }
 }
