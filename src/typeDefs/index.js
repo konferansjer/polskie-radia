@@ -20,8 +20,8 @@ const baseTypes = gql`
   }
 
   enum Role {
-    admin
-    client
+    ADMIN
+    CLIENT
   }
 `
 

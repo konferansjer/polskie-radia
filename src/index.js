@@ -26,7 +26,8 @@ function skipJwtError (err, req, res, next) {
       DB_PORT,
       DB_NAME,
       AUTH0_DOMAIN,
-      AUTH0_AUDIENCE
+      AUTH0_AUDIENCE,
+      ENGINE_API_KEY
     } = process.env
 
     await mongoose.connect(
@@ -59,7 +60,10 @@ function skipJwtError (err, req, res, next) {
         requireAuth: RequireAuthDirective
       },
       playground: NODE_ENV !== 'production',
-      context: jwtAuth
+      context: jwtAuth,
+      engine: {
+        apiKey: ENGINE_API_KEY
+      }
     })
 
     server.applyMiddleware({ app })

@@ -14,15 +14,24 @@ export default {
       return Radio.findById(id)
     }
   },
+  Radio: {
+    __resolveType(radio) {
+      switch (radio.type) {
+        case 'FM': return 'FmRadio'
+        case 'ONLINE': return 'OnlineRadio'
+      }
+    }
+  },
   Mutation: {
-    createRadio: (root, args, context, info) => {
-      return Radio.create(args)
+    createFmRadio: (root, { input }, context, info) => {
+      input.type = 'FM'
+      return Radio.create(input)
     },
-    deleteRadio: async (root, { id }, context, info) => {
-      await Radio.find({ _id: id }).remove().exec()
-      return true
+    createOnlineRadio: (root, { input }, context, info) => {
+      input.type = 'ONLINE'
+      return Radio.create(input)
     },
-    updateRadio: (root, { id, ...args }, context, info) => {
+    updateFmRadio: (root, { input: { id, ...args } }, context, info) => {
       if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new UserInputError('Invalid id')
       }
@@ -30,6 +39,19 @@ export default {
         if (err) return err
         return radio
       })
+    },
+    updateOnlineRadio: (root, { input: { id, ...args } }, context, info) => {
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new UserInputError('Invalid id')
+      }
+      return Radio.findByIdAndUpdate(id, { $set: args }, { new: true }, (err, radio) => {
+        if (err) return err
+        return radio
+      })
+    },
+    deleteRadio: async (root, { id }, context, info) => {
+      await Radio.remove({ _id: id })
+      return true
     },
     addRadioToFavourites: async (root, { id }, { user }, info) => {
       await User.update(
