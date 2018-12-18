@@ -8,7 +8,7 @@ export default gql`
   }
 
   extend type Query {
-    listRadios(type: RadioType): [Radio!]! 
+    listRadios(type: RadioType, page: Int, limit: Int): [Radio!]! 
     findRadioById(id: ID!): Radio
   }
 

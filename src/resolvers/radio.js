@@ -4,8 +4,9 @@ import { UserInputError } from 'apollo-server-express'
 
 export default {
   Query: {
-    listRadios: (root, args, context, info) => {
-      return Radio.find({})
+    listRadios: (root, { page = 0, limit = 25, type }, context, info) => {
+      let params = type ? { type } : {}
+      return Radio.find(params).skip(page * limit).limit(limit)
     },
     findRadioById: (root, { id }, context, info) => {
       if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -15,10 +16,11 @@ export default {
     }
   },
   Radio: {
-    __resolveType(radio) {
+    __resolveType (radio) {
       switch (radio.type) {
         case 'FM': return 'FmRadio'
         case 'ONLINE': return 'OnlineRadio'
+        default: return null
       }
     }
   },
