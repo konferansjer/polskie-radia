@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "eval $(cat .env) nodemon -r esm",
-    "start": "eval $(cat .env) node -r esm ."
+    "start": "eval $(cat .env) node -r esm .",
+    "heroku:start": "node -r esm index.js"
   },
   "devDependencies": {
     "esm": "^3.0.84",
