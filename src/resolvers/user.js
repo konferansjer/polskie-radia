@@ -13,14 +13,13 @@ export default {
       }
       return User.findById(id)
     },
-    me: (root, args, { user }, info) => {
-      return User.findById(user._id)
-    }
-  },
-  User: {
-    favouriteRadios: async (user) => {
-      const result = await User.findById(user).populate('favouriteRadios').exec()
-      return result.favouriteRadios
+    me: (root, args, context, info) => {
+      let fields = info.operation.selectionSet.selections[0].selectionSet.selections.map(selection => selection.name.value)
+      if (fields.includes('favouriteRadios')) {
+        return User.findById(context.user._id).populate('favouriteRadios').exec()
+      } else {
+        return context.user
+      }
     }
   }
 }

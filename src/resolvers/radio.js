@@ -8,6 +8,25 @@ export default {
       let params = type ? { type } : {}
       return Radio.find(params).skip(page * limit).limit(limit)
     },
+    listRadiosWithFavourites: async (root, { page = 0, limit = 25, type }, context, info) => {
+      let params = type ? { type } : {}
+
+      return Radio.aggregate([
+        {
+          '$match': params
+        },
+        {
+          '$addFields': {
+            'isFavourite': {
+              '$in': ['$_id', context.user.favouriteRadios]
+            }
+          }
+        }
+      ])
+        .sort('-isFavourite')
+        .skip(page * limit)
+        .limit(limit)
+    },
     findRadioById: (root, { id }, context, info) => {
       if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new UserInputError('Invalid id')

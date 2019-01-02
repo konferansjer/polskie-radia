@@ -9,6 +9,7 @@ export default gql`
 
   extend type Query {
     listRadios(type: RadioType, page: Int, limit: Int): [Radio!]! 
+    listRadiosWithFavourites(type: RadioType, page: Int, limit: Int): [Radio!]! @requireAuth(roles: [ADMIN, CLIENT])
     findRadioById(id: ID!): Radio
   }
 
