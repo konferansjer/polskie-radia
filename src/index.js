@@ -18,7 +18,7 @@ function skipJwtError (err, req, res, next) {
 (async () => {
   try {
     const {
-      APP_PORT = 3000,
+      PORT = 3000,
       NODE_ENV = 'development',
       DB_USER,
       DB_HOST,
@@ -67,7 +67,7 @@ function skipJwtError (err, req, res, next) {
     })
 
     server.applyMiddleware({ app })
-    app.listen({ port: APP_PORT }, () => console.log(`http://localhost:${APP_PORT}${server.graphqlPath}`))
+    app.listen({ port: PORT }, () => console.log(`http://localhost:${PORT}${server.graphqlPath}`))
   } catch (error) {
     console.error(error)
   }
