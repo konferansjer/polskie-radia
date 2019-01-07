@@ -32,6 +32,7 @@ export default gql`
     streamUrl: String!
     imageUrl: String
     desc: String
+    isFavourite: Boolean 
     createdAt: String
     updatedAt: String
   }
@@ -43,6 +44,7 @@ export default gql`
     streamUrl: String!
     imageUrl: String
     desc: String
+    isFavourite: Boolean
     createdAt: String
     updatedAt: String
     frequency: String!
@@ -56,6 +58,7 @@ export default gql`
     streamUrl: String!
     imageUrl: String
     desc: String
+    isFavourite: Boolean
     categories: [String!]!
     createdAt: String
     updatedAt: String

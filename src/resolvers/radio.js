@@ -43,6 +43,16 @@ export default {
       }
     }
   },
+  FmRadio: {
+    id: (root, args, context, info) => {
+      return root._id.toString()
+    }
+  },
+  OnlineRadio: {
+    id: (root, args, context, info) => {
+      return root._id.toString()
+    }
+  },
   Mutation: {
     createFmRadio: (root, { input }, context, info) => {
       input.type = 'FM'
