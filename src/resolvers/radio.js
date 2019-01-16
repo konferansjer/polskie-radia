@@ -4,11 +4,11 @@ import { UserInputError, PubSub } from 'apollo-server-express'
 
 const pubsub = new PubSub()
 
-const RADIO_ADDED = 'RADIO_ADDED'
+const OBSERVE_RADIO = 'OBSERVE_RADIO'
 export default {
   Subscription: {
-    radioAdded: {
-      subscribe: () => pubsub.asyncIterator([RADIO_ADDED])
+    observeRadios: {
+      subscribe: () => pubsub.asyncIterator([OBSERVE_RADIO])
     }
   },
   Query: {
@@ -65,12 +65,24 @@ export default {
     createFmRadio: async (root, { input }, context, info) => {
       input.type = 'FM'
       let radio = await Radio.create(input)
-      pubsub.publish(RADIO_ADDED, { radioAdded: radio })
+      pubsub.publish(OBSERVE_RADIO, {
+        observeRadios: {
+          radio,
+          operationType: 'CREATED'
+        }
+      })
       return radio
     },
-    createOnlineRadio: (root, { input }, context, info) => {
+    createOnlineRadio: async (root, { input }, context, info) => {
       input.type = 'ONLINE'
-      return Radio.create(input)
+      let radio = await Radio.create(input)
+      pubsub.publish(OBSERVE_RADIO, {
+        observeRadios: {
+          radio,
+          operationType: 'CREATED'
+        }
+      })
+      return radio
     },
     updateFmRadio: (root, { input: { id, ...args } }, context, info) => {
       if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -78,6 +90,12 @@ export default {
       }
       return Radio.findByIdAndUpdate(id, { $set: args }, { new: true }, (err, radio) => {
         if (err) return err
+        pubsub.publish(OBSERVE_RADIO, {
+          observeRadios: {
+            radio,
+            operationType: 'UPDATED'
+          }
+        })
         return radio
       })
     },
@@ -87,12 +105,24 @@ export default {
       }
       return Radio.findByIdAndUpdate(id, { $set: args }, { new: true }, (err, radio) => {
         if (err) return err
+        pubsub.publish(OBSERVE_RADIO, {
+          observeRadios: {
+            radio,
+            operationType: 'UPDATED'
+          }
+        })
         return radio
       })
     },
     deleteRadio: async (root, { id }, context, info) => {
-      await Radio.remove({ _id: id })
-      return true
+      let radio = await Radio.findOneAndRemove({ _id: id })
+      pubsub.publish(OBSERVE_RADIO, {
+        observeRadios: {
+          radio,
+          operationType: 'DELETED'
+        }
+      })
+      return radio
     },
     addRadioToFavourites: async (root, { id }, { user }, info) => {
       await User.update(

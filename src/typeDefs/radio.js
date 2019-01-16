@@ -7,8 +7,14 @@ export default gql`
     ONLINE
   }
 
+  enum OperationType {
+    UPDATED
+    DELETED
+    CREATED
+  }
+
   extend type Subscription {
-    radioAdded: Radio!
+    observeRadios: ObservableRadio!
   }
 
   extend type Query {
@@ -24,9 +30,14 @@ export default gql`
     updateFmRadio(input: FmRadioInputUpdate) : FmRadio @requireAuth(roles: [ADMIN])
     updateOnlineRadio(input: OnlineRadioInputUpdate) : OnlineRadio @requireAuth(roles: [ADMIN])
 
-    deleteRadio(id: ID!) : Boolean! @requireAuth(roles: [ADMIN])
+    deleteRadio(id: ID!) : Radio! @requireAuth(roles: [ADMIN])
     addRadioToFavourites(id: ID!) : Boolean! @requireAuth(roles: [ADMIN, CLIENT])
     removeRadioFromFavourites(id: ID!) : Boolean! @requireAuth(roles: [ADMIN, CLIENT])
+  }
+
+  type ObservableRadio {
+    operationType: OperationType!,
+    radio: Radio!
   }
 
   interface Radio {
@@ -81,8 +92,8 @@ export default gql`
     streamUrl: String!
     imageUrl: String
     desc: String
-    frequency: String
-    city: String
+    frequency: String!
+    city: String!
   }
 
   input OnlineRadioInputUpdate {
@@ -91,7 +102,7 @@ export default gql`
     streamUrl: String
     imageUrl: String
     desc: String
-    categories: [String]
+    categories: [String!]
   }
 
   input FmRadioInputUpdate {
