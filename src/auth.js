@@ -11,9 +11,9 @@ function setClaims (user) {
   return user
 }
 
-const auth = async ({ req }) => {
+const auth = async ({ req, connection }) => {
   try {
-    if (!req.user) return {}
+    if (!req || !req.user) return {}
     let extUser = setClaims(req.user)
     const user = await User.findOneAndUpdate(
       { userId: extUser.userId },

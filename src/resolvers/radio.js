@@ -1,8 +1,16 @@
 import { Radio, User } from '../models'
 import mongoose from 'mongoose'
-import { UserInputError } from 'apollo-server-express'
+import { UserInputError, PubSub } from 'apollo-server-express'
 
+const pubsub = new PubSub()
+
+const RADIO_ADDED = 'RADIO_ADDED'
 export default {
+  Subscription: {
+    radioAdded: {
+      subscribe: () => pubsub.asyncIterator([RADIO_ADDED])
+    }
+  },
   Query: {
     listRadios: (root, { page = 0, limit = 25, type }, context, info) => {
       let params = type ? { type } : {}
@@ -54,9 +62,11 @@ export default {
     }
   },
   Mutation: {
-    createFmRadio: (root, { input }, context, info) => {
+    createFmRadio: async (root, { input }, context, info) => {
       input.type = 'FM'
-      return Radio.create(input)
+      let radio = await Radio.create(input)
+      pubsub.publish(RADIO_ADDED, { radioAdded: radio })
+      return radio
     },
     createOnlineRadio: (root, { input }, context, info) => {
       input.type = 'ONLINE'

@@ -7,6 +7,10 @@ export default gql`
     ONLINE
   }
 
+  extend type Subscription {
+    radioAdded: Radio!
+  }
+
   extend type Query {
     listRadios(type: RadioType, page: Int, limit: Int): [Radio!]! 
     listRadiosWithFavourites(type: RadioType, page: Int, limit: Int): [Radio!]! @requireAuth(roles: [ADMIN, CLIENT])
