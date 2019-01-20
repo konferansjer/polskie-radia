@@ -8,6 +8,7 @@ const radioSchema = new mongoose.Schema({
   frequency: String,
   city: String,
   categories: Array,
+  region: String,
   type: {
     type: String,
     enum: ['FM', 'ONLINE'],

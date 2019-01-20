@@ -11,7 +11,7 @@ import resolvers from './resolvers'
 import jwtAuth from './auth'
 import RequireAuthDirective from './directives/auth'
 
-function skipJwtError (err, req, res, next) {
+function skipJwtError(err, req, res, next) {
   console.error(err)
   if (err) next()
 }
@@ -61,7 +61,10 @@ function skipJwtError (err, req, res, next) {
         requireAuth: RequireAuthDirective
       },
       playground: NODE_ENV !== 'production',
-      context: jwtAuth,
+      context: async ({ req, connection }) => ({
+        user: await jwtAuth(req && req.user),
+        region: req ? req.headers['x-region'] : null
+      }),
       engine: {
         apiKey: ENGINE_API_KEY
       }

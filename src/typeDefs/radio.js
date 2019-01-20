@@ -14,7 +14,7 @@ export default gql`
   }
 
   extend type Subscription {
-    observeRadios: ObservableRadio!
+    observeRadios(region: String!): ObservableRadio!
   }
 
   extend type Query {
@@ -85,6 +85,7 @@ export default gql`
     imageUrl: String
     desc: String
     categories: [String]
+    region: String!
   }
 
   input FmRadioInput {
@@ -94,6 +95,7 @@ export default gql`
     desc: String
     frequency: String!
     city: String!
+    region: String!
   }
 
   input OnlineRadioInputUpdate {
@@ -103,6 +105,7 @@ export default gql`
     imageUrl: String
     desc: String
     categories: [String!]
+    region: String
   }
 
   input FmRadioInputUpdate {
@@ -113,5 +116,6 @@ export default gql`
     desc: String
     frequency: String
     city: String
+    region: String
   }
 `

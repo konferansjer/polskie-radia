@@ -1,6 +1,6 @@
 import { Radio, User } from '../models'
 import mongoose from 'mongoose'
-import { UserInputError, PubSub } from 'apollo-server-express'
+import { UserInputError, PubSub, withFilter } from 'apollo-server-express'
 
 const pubsub = new PubSub()
 
@@ -8,17 +8,25 @@ const OBSERVE_RADIO = 'OBSERVE_RADIO'
 export default {
   Subscription: {
     observeRadios: {
-      subscribe: () => pubsub.asyncIterator([OBSERVE_RADIO])
+      subscribe: withFilter(
+        () => pubsub.asyncIterator([OBSERVE_RADIO]),
+        (payload, variables) => {
+          return payload.observeRadios.radio.region === variables.region
+        }
+      )
     }
   },
   Query: {
-    listRadios: (root, { page = 0, limit = 25, type }, context, info) => {
-      let params = type ? { type } : {}
+    listRadios: (root, { page = 0, limit = 25, type }, { region }, info) => {
+      let params = {}
+      if (type) params.type = type
+      if (region) params.region = region
       return Radio.find(params).skip(page * limit).limit(limit)
     },
-    listRadiosWithFavourites: async (root, { page = 0, limit = 25, type }, context, info) => {
-      let params = type ? { type } : {}
-
+    listRadiosWithFavourites: async (root, { page = 0, limit = 25, type }, { region, user }, info) => {
+      let params = {}
+      if (type) params.type = type
+      if (region) params.region = region
       return Radio.aggregate([
         {
           '$match': params
@@ -26,7 +34,7 @@ export default {
         {
           '$addFields': {
             'isFavourite': {
-              '$in': ['$_id', context.user.favouriteRadios]
+              '$in': ['$_id', user.favouriteRadios]
             }
           }
         }
@@ -43,7 +51,7 @@ export default {
     }
   },
   Radio: {
-    __resolveType (radio) {
+    __resolveType(radio) {
       switch (radio.type) {
         case 'FM': return 'FmRadio'
         case 'ONLINE': return 'OnlineRadio'
