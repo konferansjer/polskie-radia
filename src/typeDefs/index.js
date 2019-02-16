@@ -1,5 +1,7 @@
 import user from './user'
 import radio from './radio'
+import report from './report'
+
 import { gql } from 'apollo-server-express'
 
 const baseTypes = gql`
@@ -28,5 +30,6 @@ const baseTypes = gql`
 export default [
   baseTypes,
   user,
-  radio
+  radio,
+  report
 ]
